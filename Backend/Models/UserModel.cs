@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using System.Data.Common;
+using Microsoft.Data.Sqlite;
 
 namespace Models;
 
@@ -17,10 +18,10 @@ public class UserModel(ISqliteConnectionFactory factory)
         };
     }
 
-    public async Task<List<User>> GetUsersForEvent(int eventId)
+    public List<User> GetUsersForEvent(int eventId)
     {
         using var connection = factory.GetConnection();
-        await connection.OpenAsync();
+        connection.Open();
 
         var stmt = @"SELECT u.id, u.email, u.login, u.phone
                     FROM user_event ev INNER JOIN user u ON ev.user_id = u.id  
@@ -30,19 +31,19 @@ public class UserModel(ISqliteConnectionFactory factory)
         command.CommandText = stmt;
         command.Parameters.AddWithValue("$id", eventId);
 
-        using var reader = await command.ExecuteReaderAsync();
+        using var reader = command.ExecuteReader();
         var users = new List<User>();
-        while (await reader.ReadAsync())
+        while (reader.Read())
         {
             users.Add(ScanUser(reader));
         }
         return users;
     }
 
-    public async Task<int> Insert(User user)
+    public int Insert(User user)
     {
         using var connection = factory.GetConnection();
-        await connection.OpenAsync();
+        connection.Open();
 
         var stmt = @"INSERT INTO user (email, login, phone, hashed_password) 
                      VALUES ($email, $login, $phone, $hashed_password);
@@ -56,13 +57,13 @@ public class UserModel(ISqliteConnectionFactory factory)
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(user.Password, 12, false);
         command.Parameters.AddWithValue("$hashed_password", passwordHash);
 
-        return Convert.ToInt32(await command.ExecuteScalarAsync());
+        return Convert.ToInt32(command.ExecuteScalar());
     }
 
-    public async Task<User?> Get(int id)
+    public User? Get(int id)
     {
         using var connection = factory.GetConnection();
-        await connection.OpenAsync();
+        connection.OpenAsync();
 
         var stmt = @"SELECT id, email, login, phone FROM user WHERE id = $id;";
 
@@ -70,8 +71,8 @@ public class UserModel(ISqliteConnectionFactory factory)
         command.CommandText = stmt;
         command.Parameters.AddWithValue("$id", id);
 
-        using var reader = await command.ExecuteReaderAsync();
-        if (await reader.ReadAsync())
+        using var reader = command.ExecuteReader();
+        if (reader.Read())
         {
             return ScanUser(reader);
         }
