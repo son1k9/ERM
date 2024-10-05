@@ -47,8 +47,8 @@ public class EventModel(ISqliteConnectionFactory factory)
         using var connection = factory.GetConnection();
         connection.OpenAsync();
 
-        var stmt = @"INSERT INTO event (name, description, date, place, canceled, oraganizer_id) 
-                     VALUES ($name, $description, $date, $place, $canceled, $oraganizer_id);
+        var stmt = @"INSERT INTO event (name, description, date, place, canceled, organizer_id) 
+                     VALUES ($name, $description, $date, $place, $canceled, $organizer_id);
                      SELECT last_insert_rowid();";
 
         var command = connection.CreateCommand();
@@ -95,7 +95,7 @@ public class EventModel(ISqliteConnectionFactory factory)
         using var connection = factory.GetConnection();
         connection.Open();
 
-        var stmt = @"SELECT name, description, date, place, canceled, organizer_id 
+        var stmt = @"SELECT id, name, description, date, place, canceled, organizer_id 
                      FROM event 
                      WHERE id = $id;";
 

@@ -8,16 +8,9 @@ public class UserModelTest
     public void Insert()
     {
         var factory = Utils.GetConnectionFactory();
-        var usersModel = new UserModel(factory);
+        var userModel = new UserModel(factory);
 
-        var user = new User
-        {
-            Email = "test@test.test",
-            Login = "test_login",
-            Phone = "89209004534",
-            Password = "password"
-        };
-        var id = usersModel.Insert(user);
+        var id = userModel.Insert(Utils.CreateUser());
         Assert.True(id > 0);
     }
 
@@ -25,17 +18,12 @@ public class UserModelTest
     public void Get()
     {
         var factory = Utils.GetConnectionFactory();
-        var usersModel = new UserModel(factory);
+        var userModel = new UserModel(factory);
 
-        var user = new User
-        {
-            Email = "test@test.test",
-            Login = "test_login",
-            Phone = "89209004534",
-            Password = "password"
-        };
-        var id = usersModel.Insert(user);
-        var u = usersModel.Get(id);
+        var id = userModel.Insert(Utils.CreateUser());
+        Assert.True(id > 0);
+
+        var u = userModel.Get(id);
         Assert.NotNull(u);
     }
 }
