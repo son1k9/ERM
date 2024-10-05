@@ -1,13 +1,51 @@
-﻿namespace Models;
+﻿using Microsoft.Data.Sqlite;
+
+namespace Models;
 
 public class EventModel(ISqliteConnectionFactory factory)
 {
     readonly ISqliteConnectionFactory factory = factory;
 
-    public async Task<int> Insert(Event _event)
+    private static Event ScanEvent(SqliteDataReader reader)
+    {
+        return new Event
+        {
+            Id = reader.GetInt32(0),
+            Name = reader.GetString(1),
+            Description = reader.GetString(2),
+            Date = reader.GetFieldValue<DateTime>(3),
+            Place = reader.GetString(4),
+            Canceled = reader.GetBoolean(5),
+            OraganizerId = reader.GetInt32(6)
+        };
+    }
+
+    public List<Event> GetEventsForUser(int userId)
+    {
+        var connection = factory.GetConnection();
+        connection.Open();
+
+        var stmt = @"SELECT name, description, date, place, canceled, organizer_id
+                     FROM user_event ev INNER JOIN event e ON ev.event_id = e.id
+                     WHERE ev.user_id = $id";
+
+        var command = connection.CreateCommand();
+        command.CommandText = stmt;
+        command.Parameters.AddWithValue("$id", userId);
+
+        using var reader = command.ExecuteReader();
+        var events = new List<Event>();
+        while (reader.Read())
+        {
+            events.Add(ScanEvent(reader));
+        }
+        return events;
+    }
+
+    public int Insert(Event _event)
     {
         using var connection = factory.GetConnection();
-        await connection.OpenAsync();
+        connection.OpenAsync();
 
         var stmt = @"INSERT INTO event (name, description, date, place, canceled, oraganizer_id) 
                      VALUES ($name, $description, $date, $place, $canceled, $oraganizer_id);
@@ -22,13 +60,13 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.Parameters.AddWithValue("$canceled", _event.Canceled);
         command.Parameters.AddWithValue("$organizer_id", _event.OraganizerId);
 
-        return Convert.ToInt32(await command.ExecuteScalarAsync());
+        return Convert.ToInt32(command.ExecuteScalar());
     }
 
-    public async Task Update(Event _event)
+    public void Update(Event _event)
     {
         using var connection = factory.GetConnection();
-        await connection.OpenAsync();
+        connection.Open();
 
         var stmt = @"UPDATE event
                      WHERE id = $id
@@ -49,13 +87,13 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.Parameters.AddWithValue("$canceled", _event.Canceled);
         command.Parameters.AddWithValue("$organizer_id", _event.OraganizerId);
 
-        await command.ExecuteNonQueryAsync();
+        command.ExecuteNonQuery();
     }
 
-    public async Task<Event?> Get(int id)
+    public Event? Get(int id)
     {
         using var connection = factory.GetConnection();
-        await connection.OpenAsync();
+        connection.Open();
 
         var stmt = @"SELECT name, description, date, place, canceled, organizer_id 
                      FROM event 
@@ -65,29 +103,19 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.CommandText = stmt;
         command.Parameters.AddWithValue("$id", id);
 
-        using var reader = await command.ExecuteReaderAsync();
-        if (reader.HasRows)
+        using var reader = command.ExecuteReader();
+        if (reader.Read())
         {
-            var _event = new Event
-            {
-                Id = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                Description = reader.GetString(2),
-                Date = reader.GetFieldValue<DateTime>(3),
-                Place = reader.GetString(4),
-                Canceled = reader.GetBoolean(5),
-                OraganizerId = reader.GetInt32(6)
-            };
-            return _event;
+            return ScanEvent(reader);
         }
 
         return null;
     }
 
-    public async Task Delete(int id)
+    public void Delete(int id)
     {
         using var connection = factory.GetConnection();
-        await connection.OpenAsync();
+        connection.Open();
 
         var stmt = @"DELETE FROM event
                     WHERE id = $id;";
@@ -96,6 +124,6 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.CommandText = stmt;
         command.Parameters.AddWithValue("$id", id);
 
-        await command.ExecuteNonQueryAsync();
+        command.ExecuteNonQuery();
     }
 }
