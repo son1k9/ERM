@@ -1,4 +1,6 @@
 
+using Models;
+
 namespace Api;
 
 public class Program
@@ -46,6 +48,40 @@ public class Program
         })
         .WithName("GetWeatherForecast")
         .WithOpenApi();
+
+        
+        var factory = new SqliteConnectionFactory(Directory.GetCurrentDirectory() + "\\Db\\events.db");
+        var models = new Model(factory);
+
+        app.MapGet("/user", (HttpContext httpContext) =>
+        {
+            var idStr = httpContext.Request.Query["id"];
+            if (int.TryParse(idStr, out int id)) 
+            {
+                var user = models.Users.Get(id);
+                if (user != null)
+                {
+                    return new
+                    {
+                        Email = user.Email,
+                        Login = user.Login,
+                        Phone = user.Phone
+                    };
+                }
+            }
+            return null;
+        });
+
+        app.MapGet("/userInsert", (HttpContext httpContext) =>
+        {
+            models.Users.Insert(new User
+            {
+                Email = "test@test.test",
+                Login = "test_login",
+                Phone = "89209004534",
+                Password = "password"
+            });
+        });
 
         app.Run();
     }
