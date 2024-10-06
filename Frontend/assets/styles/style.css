@@ -1,0 +1,33 @@
+html{
+  margin: 0px;
+  padding: 0px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+body{
+  margin: 0;
+}
+
+.HEADER{
+  background-color: #699FBA;
+  height: 8em;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.HEADER button{
+  background: none;
+  border: 0;
+  margin: 1em 0em;
+
+  width: 10em;
+  font-size: larger;
+  font-family: inherit;
+}
+.HEADER button:hover{
+  background-color: #0001;
+}
+
+#logo{
+  margin: 0.1em;
+}
+
