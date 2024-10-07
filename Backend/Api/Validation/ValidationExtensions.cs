@@ -1,8 +1,7 @@
-﻿using Api.Validation;
-using Models;
+﻿using Models;
 using System.Net.Mail;
 
-namespace Api.Extentions;
+namespace Api.Validation;
 
 public static class UserExtension
 {
@@ -10,7 +9,7 @@ public static class UserExtension
     {
         var errors = new Dictionary<string, string[]>();
 
-        var emailValidator = new Validator(user.Email).Required();
+        var emailValidator = new StringValidator(user.Email).Required();
         if (!emailValidator.Valid)
         {
             errors.Add("email", [.. emailValidator.Errors]);
@@ -23,19 +22,13 @@ public static class UserExtension
             }
         }
 
-        var loginValidator = new Validator(user.Login).Required().MinLenght(2).MaxLenght(255);
+        var loginValidator = new StringValidator(user.Login).Required().MinLenght(2).MaxLenght(255);
         if (!loginValidator.Valid)
         {
             errors.Add("login", [.. loginValidator.Errors]);
         }
 
-        var pnValidator = new Validator(user.Phone).Required();
-        if (!pnValidator.Valid)
-        {
-            errors.Add("phone", [.. pnValidator.Errors]);
-        }
-
-        var passwordValidator = new Validator(user.Password).Required().MinLenght(10).MaxLenght(255);
+        var passwordValidator = new StringValidator(user.Password).Required().MinLenght(10).MaxLenght(255);
         if (!passwordValidator.Valid)
         {
             errors.Add("password", [.. passwordValidator.Errors]);

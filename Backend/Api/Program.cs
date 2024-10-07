@@ -1,4 +1,4 @@
-using Api.Extentions;
+using Api.Routes;
 using Models;
 
 namespace Api;
@@ -12,10 +12,18 @@ public class Program
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
 
+        builder.Services.AddProblemDetails();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        var factory = new SqliteConnectionFactory(Directory.GetCurrentDirectory() + "\\Db\\events.db");
+        var dbPath = builder.Configuration["DbDataSource"];
+        if (dbPath == null)
+        {
+            Console.WriteLine("appsettings.json doesnt contain DbDataSource");
+            return;
+        }
+
+        var factory = new SqliteConnectionFactory(dbPath);
         var model = new Model(factory);
         builder.Services.AddSingleton(model);
 

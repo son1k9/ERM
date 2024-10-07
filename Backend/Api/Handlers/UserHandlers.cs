@@ -1,40 +1,41 @@
-﻿using Api.Extentions;
+﻿using Api.Validation;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Models;
 
 namespace Api.Handlers;
 
 public static class UserHandlers
 {
-    public static IResult GetUser(int id, ILogger<Program> logger, Model model, HttpContext httpContext)
+    public static IResult GetUser(int id, Model model, HttpContext httpContext)
     {
         var user = model.Users.Get(id);
 
         if (user == null)
         {
-            return Results.NotFound();
+            return TypedResults.NotFound();
         }
 
-        return Results.Ok(new
+        return TypedResults.Ok(new
         {
             user.Email,
             user.Login,
-            user.Phone
         });
     }
 
-    public static IResult RegisterUser(User user, ILogger<Program> logger, Model model, HttpContext httpContext)
+    public static IResult RegisterUser(User user, Model model, HttpContext httpContext)
     {
         var errors = user.Validate();
         if (errors.Count > 0)
         {
-            return Results.ValidationProblem(errors);
+            return TypedResults.ValidationProblem(errors);
         }
 
-        if (model.Users.Insert(user) > 0)
+        //TODO: Add exception type for same email or login and include this information in the response
+        user.Id = model.Users.Insert(user);
+        return TypedResults.Created($"/user/{user.Id}", new
         {
-            return Results.Ok();
-        }
-
-        return Results.StatusCode(500);
+            user.Email,
+            user.Login,
+        });
     }
 }

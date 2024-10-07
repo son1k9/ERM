@@ -8,7 +8,7 @@ public class Utils
 
     public static ISqliteConnectionFactory GetConnectionFactory()
     {
-        var db = Directory.CreateTempSubdirectory().FullName + "\\events.db";
+        var db = Path.Combine(Directory.CreateTempSubdirectory().FullName, "events.db");
         File.Copy(DbFileName, db);
         File.Copy(DbFileName + "-shm", db + "-shm");
         File.Copy(DbFileName + "-wal", db + "-wal");
@@ -21,7 +21,6 @@ public class Utils
         {
             Email = "test@test.test",
             Login = "test_login",
-            Phone = "89209004534",
             Password = "password"
         };
     }
