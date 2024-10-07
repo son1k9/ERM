@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 
 namespace Models;
 
@@ -14,7 +13,6 @@ public class UserModel(ISqliteConnectionFactory factory)
             Id = reader.GetInt32(0),
             Email = reader.GetString(1),
             Login = reader.GetString(2),
-            Phone = reader.GetString(3),
         };
     }
 
@@ -45,15 +43,14 @@ public class UserModel(ISqliteConnectionFactory factory)
         using var connection = factory.GetConnection();
         connection.Open();
 
-        var stmt = @"INSERT INTO user (email, login, phone, hashed_password) 
-                     VALUES ($email, $login, $phone, $hashed_password);
+        var stmt = @"INSERT INTO user (email, login, hashed_password) 
+                     VALUES ($email, $login, $hashed_password);
                      SELECT last_insert_rowid();";
 
         var command = connection.CreateCommand();
         command.CommandText = stmt;
         command.Parameters.AddWithValue("$email", user.Email);
         command.Parameters.AddWithValue("$login", user.Login);
-        command.Parameters.AddWithValue("$phone", user.Phone);
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(user.Password, 12, false);
         command.Parameters.AddWithValue("$hashed_password", passwordHash);
 
@@ -65,7 +62,7 @@ public class UserModel(ISqliteConnectionFactory factory)
         using var connection = factory.GetConnection();
         connection.OpenAsync();
 
-        var stmt = @"SELECT id, email, login, phone FROM user WHERE id = $id;";
+        var stmt = @"SELECT id, email, login FROM user WHERE id = $id;";
 
         var command = connection.CreateCommand();
         command.CommandText = stmt;
