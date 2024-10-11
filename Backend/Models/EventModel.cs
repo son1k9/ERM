@@ -13,7 +13,7 @@ public class EventModel(ISqliteConnectionFactory factory)
             Id = reader.GetInt32(0),
             Name = reader.GetString(1),
             Description = reader.GetString(2),
-            Date = reader.GetFieldValue<DateTime>(3),
+            Date = reader.GetDateTime(3),
             Place = reader.GetString(4),
             Canceled = reader.GetBoolean(5),
             OraganizerId = reader.GetInt32(6)
@@ -63,23 +63,24 @@ public class EventModel(ISqliteConnectionFactory factory)
         return Convert.ToInt32(command.ExecuteScalar());
     }
 
-    public void Update(Event _event)
+    public bool Update(Event _event)
     {
         using var connection = factory.GetConnection();
         connection.Open();
 
         var stmt = @"UPDATE event
-                     WHERE id = $id
                      SET 
                         name = $name,
                         description = $description,
                         date = $date,
                         place = $place,
                         canceled = $canceled,
-                        organizer_id = $organizer_id;";
+                        organizer_id = $organizer_id
+                     WHERE id = $id;";
 
         var command = connection.CreateCommand();
         command.CommandText = stmt;
+        command.Parameters.AddWithValue("$id", _event.Id);
         command.Parameters.AddWithValue("$name", _event.Name);
         command.Parameters.AddWithValue("$description", _event.Description);
         command.Parameters.AddWithValue("$date", _event.Date);
@@ -87,7 +88,7 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.Parameters.AddWithValue("$canceled", _event.Canceled);
         command.Parameters.AddWithValue("$organizer_id", _event.OraganizerId);
 
-        command.ExecuteNonQuery();
+        return command.ExecuteNonQuery() > 0;
     }
 
     public Event? Get(int id)
@@ -112,7 +113,7 @@ public class EventModel(ISqliteConnectionFactory factory)
         return null;
     }
 
-    public void Delete(int id)
+    public bool Delete(int id)
     {
         using var connection = factory.GetConnection();
         connection.Open();
@@ -124,6 +125,6 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.CommandText = stmt;
         command.Parameters.AddWithValue("$id", id);
 
-        command.ExecuteNonQuery();
+        return command.ExecuteNonQuery() > 0;
     }
 }

@@ -3,7 +3,7 @@ using System.Net.Mail;
 
 namespace Api.Validation;
 
-public static class UserExtension
+public static class ValidationExtensions
 {
     public static Dictionary<string, string[]> Validate(this User user)
     {
@@ -34,6 +34,12 @@ public static class UserExtension
             errors.Add("password", [.. passwordValidator.Errors]);
         }
 
+        return errors;
+    }
+
+    public static Dictionary<string, string[]> Validate(this Event _event)
+    {
+        var errors = new Dictionary<string, string[]>();
         return errors;
     }
 }
