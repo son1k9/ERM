@@ -4,6 +4,7 @@ html{
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 body{
+  font-family: inherit;
   margin: 0;
 }
 
@@ -11,7 +12,7 @@ body{
   background-color: #699FBA;
   height: 8em;
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
 }
 
 .HEADER button{
@@ -29,5 +30,48 @@ body{
 
 #logo{
   margin: 0.1em;
+  align-content: flex-end;
+}
+
+.BODY{
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+}
+
+.Event{
+  font-family: inherit;
+  background: #D3D3D3;
+  border-radius: 1em;
+  width: 95vw;
+  align-self: center;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  margin: 1em;
+  padding: 0.5em 1em;
+}
+
+.Event p{
+  margin: 0.3em;
+  padding: 0.3em;
+  min-height: 2em;
+  border-radius: 0.5em;
+  background-color: #0001;
+}
+
+.Event button{
+  background: none;
+  border: 0;
+  border-radius: 0.5em;
+  width: fit-content;
+  padding: 0.6em 2em;
+  align-self: flex-start;
+  margin: 0.3em;
+}
+.Event button:hover{
+  background-color: #0001;
 }
 
