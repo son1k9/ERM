@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Api.Validation;
 
 public class StringValidator(string str)
@@ -30,6 +32,18 @@ public class StringValidator(string str)
         if (Value?.Length < lenght)
         {
             Errors.Add($"Min lenght is {lenght}");
+        }
+        return this;
+    }
+
+    public StringValidator Mathes(Regex regex, string message)
+    {
+        if (Value != null)
+        {
+            if (!regex.IsMatch(Value))
+            {
+                Errors.Add(message);
+            };
         }
         return this;
     }

@@ -4,7 +4,7 @@ namespace Api.Controllers;
 
 public static class Helpers
 {
-    public static User GetAuthorizedUser(HttpContext httpContext)
+    public static User GetAuthenticatedUser(HttpContext httpContext)
     {
         if (httpContext.Items["User"] is User user)
         {

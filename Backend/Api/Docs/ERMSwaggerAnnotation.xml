@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Api</name>
+    </assembly>
+    <members>
+        <member name="M:Api.Controllers.EventsController.GetEvent(System.Int32,Models.Model)">
+            <summary>
+            Get event by ID
+            </summary>
+            <param name="id">Event ID.</param>
+            <returns>Event details if found, otherwise NotFound.</returns>
+        </member>
+        <member name="M:Api.Controllers.EventsController.CreateEvent(Api.Controllers.EventsController.EventRequest,Models.Model)">
+            <summary>
+            Create a new event. Requires authentication
+            </summary>
+            <param name="request">Event details for creation.</param>
+            <returns>Created event details if succesfull, otherwise BadRequest with validation errors.</returns>
+        </member>
+        <member name="M:Api.Controllers.EventsController.UpdateEvent(System.Int32,Api.Controllers.EventsController.EventRequest,Models.Model)">
+            <summary>
+            Update an existing event. Requires authentication
+            </summary>
+            <param name="id">Event ID.</param>
+            <param name="request">Event details.</param>
+            <returns>No content if succesfull, BadRequest with validation problems if they exist, otherwise NotFound.</returns>
+        </member>
+        <member name="M:Api.Controllers.EventsController.DeleteEvent(System.Int32,Models.Model)">
+            <summary>
+            Delete an existing event. Requires authentication
+            </summary>
+            <param name="id">Event ID.</param>
+            <returns>NoContent if succesfull, otherwise NotFound.</returns>
+        </member>
+        <member name="M:Api.Controllers.EventsController.GetUsersForEvent(System.Int32,Models.Model)">
+            <summary>
+            Get a list of users for event
+            </summary>
+            <param name="id">Event ID.</param>
+            <returns>List of users for event if succesfull, otherwise NotFound.</returns>
+        </member>
+        <member name="M:Api.Controllers.EventsController.GetEvents(System.Int32,System.Int32,Models.Model)">
+            <summary>
+            Get events from pagined list
+            </summary>
+            <param name="page">Page number</param>
+            <param name="pageSize">Page size</param>
+            <returns>List of events</returns>
+        </member>
+        <member name="M:Api.Controllers.LoginController.Login(Api.Controllers.LoginController.LoginData,Models.Model)">
+            <summary>
+            Get authentication token for user
+            </summary>
+            <param name="loginData">User's data to login</param>
+            <returns>Token to use for authentication</returns>
+        </member>
+        <member name="M:Api.Controllers.UsersController.GetUser(System.String,Models.Model)">
+            <summary>
+            Get user by login
+            </summary>
+            <param name="login">User's login.</param>
+            <returns>User information if found, otherwise NotFound.</returns>
+        </member>
+        <member name="M:Api.Controllers.UsersController.RegisterUser(Api.Controllers.UsersController.RegisterRequest,Models.Model)">
+            <summary>
+            Register a new user
+            </summary>
+            <param name="request">Users information.</param>
+            <returns>Created user inforamtion if succesfull, otherwise BadRequset with validation problems.</returns>
+        </member>
+        <member name="M:Api.Controllers.UsersController.GetEventsForUser(System.String,Models.Model)">
+            <summary>
+            Get a list of events of a user
+            </summary>
+            <param name="login">User's login.</param>
+            <returns>A list of events of a user if succesfull, otherwise NotFound.</returns>
+        </member>
+        <member name="M:Api.Controllers.UsersController.SubscribeToEvent(System.Int32,Models.Model)">
+            <summary>
+            Subscribe authenticated user for an event. Requires authentication
+            </summary>
+            <param name="id">Event ID.</param>
+            <returns>NoContent if succesfull, BadRequest with an error if occurs, otherwise NotFound.</returns>
+        </member>
+        <member name="M:Api.Controllers.UsersController.UnsubscribeFromEvent(System.Int32,Models.Model)">
+            <summary>
+            Unsubscribe authenticated user from an event. Requires authentication
+            </summary>
+            <param name="id">Event ID.</param>
+            <returns>NoContent if succesfull, BadRequest with an error if occurs, otherwise NotFound.</returns>
+        </member>
+        <member name="M:Api.Controllers.UsersController.GetUserForToken">
+            <summary>
+            Get authenticated user. Requires authentication
+            </summary>
+            <returns>User information.</returns>
+        </member>
+        <member name="M:Api.Validation.ValidationExtensions.LoginRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[a-zA-Z0-9_]+$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Z_a-z] atomically at least once.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.LoginRegex_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the LoginRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.LoginRegex_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LoginRegex_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.LoginRegex_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LoginRegex_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.LoginRegex_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LoginRegex_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LoginRegex_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LoginRegex_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiWordChars">
+            <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz".</summary>
+        </member>
+    </members>
+</doc>

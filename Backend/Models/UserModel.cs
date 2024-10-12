@@ -8,6 +8,7 @@ public static class UserError
     public const string DuplicateEmail = "User with this email already exists";
     public const string DuplicateLogin = "User with this login already exists";
     public const string DuplicateEvent = "User is already subscribed to event";
+    public const string NotSubscribedToEvent = "User is not subscribed to this event";
 }
 
 public class UserModel(ISqliteConnectionFactory factory)
@@ -139,6 +140,25 @@ public class UserModel(ISqliteConnectionFactory factory)
             }
             throw;
         }
+    }
+
+    public string? RemoveEventFromUser(int userId, int eventId)
+    {
+        using var connection = factory.GetConnection();
+        connection.Open();
+
+        var stmt = @"DELETE FROM user_event
+                     WHERE user_id = $user_id AND event_id = $event_id;";
+
+        var command = connection.CreateCommand();
+        command.CommandText = stmt;
+        command.Parameters.AddWithValue("$user_id", userId);
+        command.Parameters.AddWithValue("event_id", eventId);
+        if (command.ExecuteNonQuery() > 0)
+        {
+            return null;
+        }
+        return UserError.NotSubscribedToEvent;
     }
 
     public Result<int> Insert(User user)

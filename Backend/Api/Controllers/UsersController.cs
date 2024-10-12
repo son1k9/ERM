@@ -18,6 +18,13 @@ public class UsersController : ControllerBase
         public string Login { get; set; } = user.Login;
     }
 
+    public class AuthorizedUserResponse(User user)
+    {
+        public int Id { get; set; } = user.Id;
+        public string Email { get; set; } = user.Email;
+        public string Login { get; set; } = user.Login;
+    }
+
     public class RegisterRequest
     {
         public string Email { get; set; } = string.Empty;
@@ -28,13 +35,18 @@ public class UsersController : ControllerBase
         {
             return new User
             {
-                Email = Email,
-                Login = Login,
+                Email = Email.Trim(),
+                Login = Login.Trim(),
                 Password = Password
             };
         }
     }
 
+    /// <summary>
+    /// Get user by login
+    /// </summary>
+    /// <param name="login">User's login.</param>
+    /// <returns>User information if found, otherwise NotFound.</returns>
     [HttpGet("{login}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -50,6 +62,11 @@ public class UsersController : ControllerBase
         return new UserResponse(user);
     }
 
+    /// <summary>
+    /// Register a new user
+    /// </summary>
+    /// <param name="request">Users information.</param>
+    /// <returns>Created user inforamtion if succesfull, otherwise BadRequset with validation problems.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -79,6 +96,11 @@ public class UsersController : ControllerBase
         return Created($"/user/{user.Id}", new UserResponse(user));
     }
 
+    /// <summary>
+    /// Get a list of events of a user
+    /// </summary>
+    /// <param name="login">User's login.</param>
+    /// <returns>A list of events of a user if succesfull, otherwise NotFound.</returns>
     [HttpGet("{login}/events")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -94,19 +116,29 @@ public class UsersController : ControllerBase
         var eventResponses = new List<EventsController.EventResponse>();
         foreach (var _event in events)
         {
-            eventResponses.Add(new EventsController.EventResponse(_event, user));
+            var eventUser = model.Users.Get(_event.OrganizerId);
+            if (eventUser == null)
+            {
+                return NotFound();
+            }
+            eventResponses.Add(new EventsController.EventResponse(_event, eventUser));
         }
 
         return eventResponses;
     }
 
-    [HttpPost("add-event/{id}")]
+    /// <summary>
+    /// Subscribe authenticated user for an event. Requires authentication
+    /// </summary>
+    /// <param name="id">Event ID.</param>
+    /// <returns>NoContent if succesfull, BadRequest with an error if occurs, otherwise NotFound.</returns>
+    [HttpPatch("add-event/{id}")]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult SubscribeToEvent([FromRoute] int id, Model model)
     {
-        var user = Helpers.GetAuthorizedUser(HttpContext);
+        var user = Helpers.GetAuthenticatedUser(HttpContext);
 
         var _event = model.Events.Get(id);
         if (_event == null)
@@ -121,5 +153,48 @@ public class UsersController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Unsubscribe authenticated user from an event. Requires authentication
+    /// </summary>
+    /// <param name="id">Event ID.</param>
+    /// <returns>NoContent if succesfull, BadRequest with an error if occurs, otherwise NotFound.</returns>
+    [HttpPatch("remove-event/{id}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult UnsubscribeFromEvent([FromRoute] int id, Model model)
+    {
+        var user = Helpers.GetAuthenticatedUser(HttpContext);
+
+        var _event = model.Events.Get(id);
+        if (_event == null)
+        {
+            return NotFound();
+        }
+
+        var error = model.Users.RemoveEventFromUser(user.Id, _event.Id);
+        if (error != null)
+        {
+            return BadRequest(error);
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Get authenticated user. Requires authentication
+    /// </summary>
+    /// <returns>User information.</returns>
+    [HttpGet]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<AuthorizedUserResponse> GetUserForToken()
+    {
+        var user = Helpers.GetAuthenticatedUser(HttpContext);
+
+        return new AuthorizedUserResponse(user);
     }
 }

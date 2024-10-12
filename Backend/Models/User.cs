@@ -1,6 +1,4 @@
-﻿using System.Net.Mail;
-
-namespace Models;
+﻿namespace Models;
 
 public class User
 {
