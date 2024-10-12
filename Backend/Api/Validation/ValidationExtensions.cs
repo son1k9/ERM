@@ -1,4 +1,5 @@
-﻿using Models;
+﻿using Api.Controllers;
+using Models;
 using System.Net.Mail;
 
 namespace Api.Validation;
