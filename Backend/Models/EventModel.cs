@@ -16,7 +16,7 @@ public class EventModel(ISqliteConnectionFactory factory)
             Date = reader.GetDateTime(3),
             Place = reader.GetString(4),
             Canceled = reader.GetBoolean(5),
-            OraganizerId = reader.GetInt32(6)
+            OrganizerId = reader.GetInt32(6)
         };
     }
 
@@ -25,7 +25,7 @@ public class EventModel(ISqliteConnectionFactory factory)
         var connection = factory.GetConnection();
         connection.Open();
 
-        var stmt = @"SELECT name, description, date, place, canceled, organizer_id
+        var stmt = @"SELECT id, name, description, date, place, canceled, organizer_id
                      FROM user_event ev INNER JOIN event e ON ev.event_id = e.id
                      WHERE ev.user_id = $id";
 
@@ -58,7 +58,7 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.Parameters.AddWithValue("$date", _event.Date);
         command.Parameters.AddWithValue("$place", _event.Place);
         command.Parameters.AddWithValue("$canceled", _event.Canceled);
-        command.Parameters.AddWithValue("$organizer_id", _event.OraganizerId);
+        command.Parameters.AddWithValue("$organizer_id", _event.OrganizerId);
 
         return Convert.ToInt32(command.ExecuteScalar());
     }
@@ -86,7 +86,7 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.Parameters.AddWithValue("$date", _event.Date);
         command.Parameters.AddWithValue("$place", _event.Place);
         command.Parameters.AddWithValue("$canceled", _event.Canceled);
-        command.Parameters.AddWithValue("$organizer_id", _event.OraganizerId);
+        command.Parameters.AddWithValue("$organizer_id", _event.OrganizerId);
 
         return command.ExecuteNonQuery() > 0;
     }

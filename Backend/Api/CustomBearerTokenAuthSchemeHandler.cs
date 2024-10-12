@@ -45,6 +45,7 @@ public class CustomBearerTokenAuthSchemeHandler(
         var claims = new[] { new Claim(ClaimTypes.Name, "Test") };
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims, "Tokens"));
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
+        Context.Items["User"] = user;
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 

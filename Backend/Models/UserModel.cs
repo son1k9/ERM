@@ -5,8 +5,9 @@ namespace Models;
 
 public static class UserError
 {
-    public const string DuplicateEmail = "User with email already exists";
-    public const string DuplicateLogin = "User with login already exists";
+    public const string DuplicateEmail = "User with this email already exists";
+    public const string DuplicateLogin = "User with this login already exists";
+    public const string DuplicateEvent = "User is already subscribed to event";
 }
 
 public class UserModel(ISqliteConnectionFactory factory)
@@ -113,6 +114,33 @@ public class UserModel(ISqliteConnectionFactory factory)
         return users;
     }
 
+    public string? AddEventToUser(int userId, int eventId)
+    {
+        using var connection = factory.GetConnection();
+        connection.Open();
+
+        var stmt = @"INSERT INTO user_event(user_id, event_id)
+                     VALUES ($user_id, $event_id);";
+
+        var command = connection.CreateCommand();
+        command.CommandText = stmt;
+        command.Parameters.AddWithValue("$user_id", userId);
+        command.Parameters.AddWithValue("event_id", eventId);
+        try
+        {
+            command.ExecuteNonQuery();
+            return null;
+        }
+        catch (SqliteException e)
+        {
+            if (e.SqliteExtendedErrorCode == 1555)
+            {
+                return UserError.DuplicateEvent;
+            }
+            throw;
+        }
+    }
+
     public Result<int> Insert(User user)
     {
         using var connection = factory.GetConnection();
@@ -131,11 +159,12 @@ public class UserModel(ISqliteConnectionFactory factory)
 
         try
         {
-            return Convert.ToInt32(command.ExecuteScalar());
+            var id = command.ExecuteScalar();
+            return Convert.ToInt32(id);
         }
         catch (SqliteException e)
         {
-            if (e.ErrorCode == 19)
+            if (e.SqliteErrorCode == 19)
             {
                 if (e.Message.Contains("user.email"))
                 {
