@@ -1,28 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Net.Mail;
-using System.Text.RegularExpressions;
-
-namespace Models;
+﻿namespace Models;
 
 public class User
 {
-    public int Id;
+    public int Id { get; set; }
     public string Email { get; set; } = string.Empty;
     public string Login { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
-}
 
-public static class UserExtension
-{
-    public static Dictionary<string, string> Validate(this User user)
+    public string Password = string.Empty;
+    public string PasswordHash = string.Empty;
+
+    public static string HashPassword(string password)
     {
-        var errors = new Dictionary<string, string>();
+        return BCrypt.Net.BCrypt.HashPassword(password, 12, false);
+    }
 
-        bool emailValid = MailAddress.TryCreate(user.Email, out _);
-        if (!emailValid)
-        {
-            
-        }
+    public static bool PasswordMath(string password, string hash)
+    {
+        return BCrypt.Net.BCrypt.Verify(password, hash);
     }
 }

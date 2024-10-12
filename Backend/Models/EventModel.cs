@@ -13,11 +13,37 @@ public class EventModel(ISqliteConnectionFactory factory)
             Id = reader.GetInt32(0),
             Name = reader.GetString(1),
             Description = reader.GetString(2),
-            Date = reader.GetFieldValue<DateTime>(3),
+            Date = reader.GetDateTime(3),
             Place = reader.GetString(4),
             Canceled = reader.GetBoolean(5),
-            OraganizerId = reader.GetInt32(6)
+            OrganizerId = reader.GetInt32(6)
         };
+    }
+
+    public List<Event> GetEvents(int page, int pageSize)
+    {
+        var offset = (page - 1) * pageSize;
+
+        var connection = factory.GetConnection();
+        connection.Open();
+
+        var stmt = @"SELECT id, name, description, date, place, canceled, organizer_id
+                     FROM event
+                     ORDER BY date DESC
+                     LIMIT $pageSize OFFSET $offset;";
+
+        var command = connection.CreateCommand();
+        command.CommandText = stmt;
+        command.Parameters.AddWithValue("$pageSize", pageSize);
+        command.Parameters.AddWithValue("$offset", offset);
+
+        using var reader = command.ExecuteReader();
+        var events = new List<Event>();
+        while (reader.Read())
+        {
+            events.Add(ScanEvent(reader));
+        }
+        return events;
     }
 
     public List<Event> GetEventsForUser(int userId)
@@ -25,7 +51,7 @@ public class EventModel(ISqliteConnectionFactory factory)
         var connection = factory.GetConnection();
         connection.Open();
 
-        var stmt = @"SELECT name, description, date, place, canceled, organizer_id
+        var stmt = @"SELECT id, name, description, date, place, canceled, organizer_id
                      FROM user_event ev INNER JOIN event e ON ev.event_id = e.id
                      WHERE ev.user_id = $id";
 
@@ -58,36 +84,37 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.Parameters.AddWithValue("$date", _event.Date);
         command.Parameters.AddWithValue("$place", _event.Place);
         command.Parameters.AddWithValue("$canceled", _event.Canceled);
-        command.Parameters.AddWithValue("$organizer_id", _event.OraganizerId);
+        command.Parameters.AddWithValue("$organizer_id", _event.OrganizerId);
 
         return Convert.ToInt32(command.ExecuteScalar());
     }
 
-    public void Update(Event _event)
+    public bool Update(Event _event)
     {
         using var connection = factory.GetConnection();
         connection.Open();
 
         var stmt = @"UPDATE event
-                     WHERE id = $id
                      SET 
                         name = $name,
                         description = $description,
                         date = $date,
                         place = $place,
                         canceled = $canceled,
-                        organizer_id = $organizer_id;";
+                        organizer_id = $organizer_id
+                     WHERE id = $id;";
 
         var command = connection.CreateCommand();
         command.CommandText = stmt;
+        command.Parameters.AddWithValue("$id", _event.Id);
         command.Parameters.AddWithValue("$name", _event.Name);
         command.Parameters.AddWithValue("$description", _event.Description);
         command.Parameters.AddWithValue("$date", _event.Date);
         command.Parameters.AddWithValue("$place", _event.Place);
         command.Parameters.AddWithValue("$canceled", _event.Canceled);
-        command.Parameters.AddWithValue("$organizer_id", _event.OraganizerId);
+        command.Parameters.AddWithValue("$organizer_id", _event.OrganizerId);
 
-        command.ExecuteNonQuery();
+        return command.ExecuteNonQuery() > 0;
     }
 
     public Event? Get(int id)
@@ -112,7 +139,7 @@ public class EventModel(ISqliteConnectionFactory factory)
         return null;
     }
 
-    public void Delete(int id)
+    public bool Delete(int id)
     {
         using var connection = factory.GetConnection();
         connection.Open();
@@ -124,6 +151,6 @@ public class EventModel(ISqliteConnectionFactory factory)
         command.CommandText = stmt;
         command.Parameters.AddWithValue("$id", id);
 
-        command.ExecuteNonQuery();
+        return command.ExecuteNonQuery() > 0;
     }
 }
