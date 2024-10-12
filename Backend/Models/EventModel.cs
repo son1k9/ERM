@@ -20,6 +20,32 @@ public class EventModel(ISqliteConnectionFactory factory)
         };
     }
 
+    public List<Event> GetEvents(int page, int pageSize)
+    {
+        var offset = (page - 1) * pageSize;
+
+        var connection = factory.GetConnection();
+        connection.Open();
+
+        var stmt = @"SELECT id, name, description, date, place, canceled, organizer_id
+                     FROM event
+                     ORDER BY date DESC
+                     LIMIT $pageSize OFFSET $offset;";
+
+        var command = connection.CreateCommand();
+        command.CommandText = stmt;
+        command.Parameters.AddWithValue("$pageSize", pageSize);
+        command.Parameters.AddWithValue("$offset", offset);
+
+        using var reader = command.ExecuteReader();
+        var events = new List<Event>();
+        while (reader.Read())
+        {
+            events.Add(ScanEvent(reader));
+        }
+        return events;
+    }
+
     public List<Event> GetEventsForUser(int userId)
     {
         var connection = factory.GetConnection();

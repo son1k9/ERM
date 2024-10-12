@@ -1,4 +1,5 @@
 using Api.Middleware;
+using Microsoft.OpenApi.Models;
 using Models;
 
 namespace Api;
@@ -23,10 +24,7 @@ public class Program
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
 
-        builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
-        {
-            
-        });
+        builder.Services.AddControllers();
 
         builder.Services.AddProblemDetails();
         builder.Services.AddAuthentication().AddScheme<CustomBearerTokenAuthSchemeOptions,
@@ -36,7 +34,16 @@ public class Program
         });
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            //c.EnableAnnotations();
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "ERM Web API",
+                Description = "API to manage events",
+            });
+            c.IncludeXmlComments("Docs/ERMSwaggerAnnotation.xml");
+        });
 
         var app = builder.Build();
 

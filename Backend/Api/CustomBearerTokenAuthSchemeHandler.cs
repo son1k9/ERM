@@ -12,7 +12,7 @@ namespace Api;
 
 public class CustomBearerTokenAuthSchemeOptions : AuthenticationSchemeOptions
 {
-    public Model Model { get; set; }
+    public Model? Model { get; set; }
 }
 
 public class CustomBearerTokenAuthSchemeHandler(
@@ -22,6 +22,11 @@ public class CustomBearerTokenAuthSchemeHandler(
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        if (Options.Model == null)
+        {
+            return Fail();
+        }
+
         var authorizationHeader = Request.Headers.Authorization;
         if (authorizationHeader.Count == 0)
         {

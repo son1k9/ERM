@@ -19,6 +19,11 @@ public class LoginController : ControllerBase
         public string Value { get; set; } = string.Empty;
     }
 
+    /// <summary>
+    /// Get authentication token for user
+    /// </summary>
+    /// <param name="loginData">User's data to login</param>
+    /// <returns>Token to use for authentication</returns>
     [HttpPost("")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
