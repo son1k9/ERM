@@ -2,15 +2,17 @@ html{
   margin: 0px;
   padding: 0px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
+  height: 100%;
 }
 body{
   font-family: inherit;
+  height: 100%;
   margin: 0;
 }
 
 .HEADER{
   background-color: #699FBA;
-  height: 8em;
+  height: 20%;
   display: flex;
   flex-direction: row;
 }
@@ -34,9 +36,19 @@ body{
 }
 
 .BODY{
+  width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
   font-family: inherit;
+}
+
+.BODY div{
+  border-radius: 1em;
+  margin: 1em;
+  padding: 0.5em;
+  background: #D3D3D3;
 }
 
 .Event{
@@ -57,21 +69,53 @@ body{
 .Event p{
   margin: 0.3em;
   padding: 0.3em;
-  min-height: 2em;
+  min-height: min-content;
   border-radius: 0.5em;
   background-color: #0001;
 }
 
+.Event div{
+  display: inline;
+}
+
 .Event button{
-  background: none;
+  background: #baa069;
   border: 0;
   border-radius: 0.5em;
   width: fit-content;
   padding: 0.6em 2em;
   align-self: flex-start;
+  font-family: inherit;
+  font-size: 10pt;
   margin: 0.3em;
 }
-.Event button:hover{
-  background-color: #0001;
+.Event button#event_subscribe{
+  background: #69ba8b;
 }
 
+.Event button:hover, .Event #event_subscribe:hover{
+  opacity: 0.4;
+}
+
+.Profile_info{
+  flex-basis: 40%;
+}
+
+.Events_tables{
+  flex-basis: 100%;
+}
+
+.Events_tables div{
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+#my_events label, #going_events label{
+  align-self: center;
+}
+
+td{
+  border: solid 1px black;
+}
