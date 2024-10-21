@@ -8,6 +8,13 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddScoped(sp =>
+	new HttpClient
+	{
+		BaseAddress = new Uri(builder.Configuration["FrontendUrl"] ?? "https://localhost:5002")
+	});
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
 
 string APIKey = app.Configuration["API"];
