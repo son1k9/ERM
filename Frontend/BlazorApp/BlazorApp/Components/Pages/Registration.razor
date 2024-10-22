@@ -1,5 +1,6 @@
 ﻿@page "/user"
 @inject IHttpClientFactory ClientFactory
+@inject HttpClient Http
 
 <PageTitle>Registration</PageTitle>
 
@@ -20,8 +21,6 @@
 
 	string? ResponseBody;
 
-	HttpClient httpClient = null!;
-
 	class User
 	{
 		public string? email { get; set; }
@@ -30,13 +29,10 @@
 	}
 
 	private async Task SignInUser(){
-		httpClient = ClientFactory.CreateClient();
-		httpClient.BaseAddress = new Uri("https:/localhost:7226/user");
-
 		var request = new HttpRequestMessage()
 		{
 			Method = new HttpMethod("POST"),
-				RequestUri = new Uri("https:/localhost:7226/user"),
+			RequestUri = new Uri("https://localhost:7226/user"),
 			Content = 
 				JsonContent.Create(new User
 				{
@@ -45,10 +41,8 @@
 					password = password
 				})
 		};
-		request.Headers.Add("Accept", "text/plain");
-		request.Headers.Add("Content-Type", "application/json");
 
-		var response = await httpClient.SendAsync(request);
+		var response = await Http.SendAsync(request);
 
 		ResponseBody = await response.Content.ReadAsStringAsync();
 	}
